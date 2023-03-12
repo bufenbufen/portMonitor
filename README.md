@@ -53,11 +53,11 @@ crontab -e
 
 
 ### 单次扫描
-![](images\1.png)
+![](https://github.com/bufenbufen/portMonitor/blob/master/images/1.png)
 
 
 
 
 ### 邮件
-![](images\3.png)
+![](https://github.com/bufenbufen/portMonitor/blob/master/images/3.png)
 
