@@ -54,10 +54,10 @@ crontab -e
 
 ### 单次扫描
 
-![](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230311160507097.png)
+
 
 
 
 ### 邮件
 
-![image-20230311225009176](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230311225009176.png)
+
