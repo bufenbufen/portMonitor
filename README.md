@@ -53,11 +53,11 @@ crontab -e
 
 
 ### 单次扫描
-![](image\1.png)
+![](images\1.png)
 
 
 
 
 ### 邮件
-![](image\3.png)
+![](images\3.png)
 
