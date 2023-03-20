@@ -22,6 +22,6 @@ def isMonday():
     ...
     """
 
-    if currentDay == 3:
+    if currentDay == 0:
         return True
     return False
