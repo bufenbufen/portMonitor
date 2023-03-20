@@ -31,7 +31,7 @@ sender_pass = xxxxxx			#发送方SMTP授权码
 receive_maile = xxxxx@163.com	    #接收方邮箱
 
 [masscan]
-path = /usr/bin/masscan		#masscan路径
+path = /usr/bin/masscan		#masscan路径，which masscan查看
 
 [portrange]
 range = 1-1000		 #扫描端口范围
