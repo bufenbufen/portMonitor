@@ -43,7 +43,7 @@ class sendemail():
         try:
             msg_root = MIMEMultipart('mixed')
             # 发送方、接收方
-            msg_root['From'] = '{}<{}>'.format(self.sender_maile, self.sender_pass)
+            msg_root['From'] = '{}<{}>'.format(self.sender_maile, self.sender_maile)
             msg_root['To'] = self.receive_maile
 
             # 主题、文本
