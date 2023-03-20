@@ -17,6 +17,7 @@ pip install -r requirements.txt
 # 安装masscan
 ubuntu: apt-get install masscan -y
 centos: yum install masscan -y
+github: https://github.com/robertdavidgraham/masscan
 ```
 
 
