@@ -1,1 +1,5 @@
-python_dateutil==2.8.2
+jsondiff==2.0.0
+nmap==0.0.1
+pyfiglet==0.8.post1
+python_dateutil==2.8.1
+python_nmap==0.7.1
