@@ -53,6 +53,6 @@ def serverScan(openPortDict):
     return portServerDcit
 
 
-# dd = {'121.5.110.219': [22, 80, 81, 8080], '175.178.253.93': [22, 80, 81, 8080]}
+# dd = {'127.0.0.1': [22, 80, 81, 8080], '127.0.0.2': [22, 80, 81, 8080]}
 # portServerDcit = serverScan(dd)
 # print(portServerDcit)
