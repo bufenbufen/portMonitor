@@ -27,10 +27,12 @@ def main():
     emailText = ''
     # 端口扫描,{'127.0.0.1':[80,81,8080]}
     openPortDict = portScan()
+    
+    #print(openPortDict)
 
     # 服务扫描,{'127.0.0.1':[{'PORT':80,'SERVICE':'http','VERSION':'nginx 1.22.1'},],}
     portServerDict = serverScan(openPortDict)
-    # portServerDict = {'127.0.0.1': [{'PORT': 22, 'SERVICE': 'ssh', 'VERSION': 'OpenSSH 8.2p1 Ubuntu 4ubuntu0.3'}, {'PORT': 80, 'SERVICE': 'http', 'VERSION': ' '}], '127.0.0.2': [{'PORT': 22, 'SERVICE': 'ssh', 'VERSION': 'OpenSSH 7.4'}, {'PORT': 80, 'SERVICE': 'http', 'VERSION': 'nginx '}]}
+    # portServerDict = {'121.5.110.219': [{'PORT': 22, 'SERVICE': 'ssh', 'VERSION': 'OpenSSH 8.2p1 Ubuntu 4ubuntu0.3'}, {'PORT': 80, 'SERVICE': 'http', 'VERSION': ' '}], '175.178.253.93': [{'PORT': 22, 'SERVICE': 'ssh', 'VERSION': 'OpenSSH 7.4'}, {'PORT': 80, 'SERVICE': 'http', 'VERSION': 'nginx '}]}
 
     # 字典转json  留存结果
     resultFileName = os.path.join(LogDirectory, '{}_scanResult.json')
@@ -70,7 +72,7 @@ def main():
         todayContentList = []
         for ip in portServerDict.keys():
             todayContentList += ['{} {} {} {}'.format(ip, infoDict.get('PORT'), infoDict.get('SERVICE'), infoDict.get('VERSION')) for infoDict in portServerDict[ip]]
-        emailText = emailText + '[监测]-全开放端口共{}个(每周一或昨日无扫描时触发)\n{}'.format(len(todayContentList),'\n'.join(todayContentList))
+        emailText = emailText + '[监测]-总开放端口{}个(周一|周三|昨日无扫描时触发)\n{}'.format(len(todayContentList),'\n'.join(todayContentList))
 
     # print(emailText)
     if emailText:
