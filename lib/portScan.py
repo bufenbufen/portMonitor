@@ -1,7 +1,8 @@
 #!/usr/bin/python
-# -*- coding: UTF-8 -*-
+# -*- coding: UTF-8 -*
 import os
 import json
+import re
 from sys import platform
 from lib.getconfig import getconfig
 
@@ -25,17 +26,16 @@ def portScan():
 
     if os.path.exists(tmpFile):
         # 提取json文件中的端口
-        with open(tmpFile, 'r') as f:
-            for line in f:
+        with open(tmpFile, 'r',encoding='utf-8') as f:
+            for line in f.readlines():
                 portList = []
                 try:
-                    if line.startswith('{ '):
-                        line = line.replace('},', '}')
-                        temp = json.loads(line)
-                        temp1 = temp["ports"][0]
-                        # scanResultList.append(temp["ip"] + ':' + str(temp1["port"]))
-                        scanReusltDict.setdefault(temp["ip"],[]).append(temp1["port"])
+                    ip = re.search('((2(5[0-5]|[0-4]\d))|[0-1]?\d{1,2})(\.((2(5[0-5]|[0-4]\d))|[0-1]?\d{1,2})){3}',line)
+                    port = re.search('port: (\d*),',line)
+                    # print(ip.group(0)+':'+str(port.group(1)))
+                    scanReusltDict.setdefault(ip.group(0),[]).append(port.group(1))
                 except Exception as e:
+                    print(e)
                     continue
             # print('开放端口:\n'+'\n'.join(scanResultList))
             # print('open port:\n\n{}'.format(scanReusltDict))
@@ -49,3 +49,5 @@ def portScan():
         pass
 
     return scanReusltDict
+
+
