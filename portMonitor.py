@@ -32,7 +32,7 @@ def main():
 
     # 服务扫描,{'127.0.0.1':[{'PORT':80,'SERVICE':'http','VERSION':'nginx 1.22.1'},],}
     portServerDict = serverScan(openPortDict)
-    # portServerDict = {'121.5.110.219': [{'PORT': 22, 'SERVICE': 'ssh', 'VERSION': 'OpenSSH 8.2p1 Ubuntu 4ubuntu0.3'}, {'PORT': 80, 'SERVICE': 'http', 'VERSION': ' '}], '175.178.253.93': [{'PORT': 22, 'SERVICE': 'ssh', 'VERSION': 'OpenSSH 7.4'}, {'PORT': 80, 'SERVICE': 'http', 'VERSION': 'nginx '}]}
+    # portServerDict = {'121.x.x.219': [{'PORT': 22, 'SERVICE': 'ssh', 'VERSION': 'OpenSSH 8.2p1 Ubuntu 4ubuntu0.3'}, {'PORT': 80, 'SERVICE': 'http', 'VERSION': ' '}], '175.x.x.93': [{'PORT': 22, 'SERVICE': 'ssh', 'VERSION': 'OpenSSH 7.4'}, {'PORT': 80, 'SERVICE': 'http', 'VERSION': 'nginx '}]}
 
     # 字典转json  留存结果
     resultFileName = os.path.join(LogDirectory, '{}_scanResult.json')
