@@ -54,11 +54,11 @@ crontab -e
 
 
 ### 扫描
-![](https://github.com/bufenbufen/portMonitor/blob/master/images/2.png)
+![](https://github.com/bufenbufen/portMonitor/blob/master/images/1.png)
 
 
 
 
 ### 邮件
-![](https://github.com/bufenbufen/portMonitor/blob/master/images/1.png)
+![](https://github.com/bufenbufen/portMonitor/blob/master/images/2.png)
 
