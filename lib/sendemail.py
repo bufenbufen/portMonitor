@@ -1,5 +1,8 @@
-#!/usr/bin/python
-# -*- coding: UTF-8 -*-
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+# @Time    : 2023/5/3 17:22
+# @Author  : name
+# @File    : sendemail.py
 import os
 import smtplib
 from email.header import Header
@@ -10,13 +13,8 @@ from configparser import ConfigParser
 RootPath = os.path.abspath('.')
 
 class sendemail():
-    """邮件发送类"""
-
     def __init__(self, config_file_path=os.path.join(RootPath,'config.ini')):
-        """
-        构造, 配置文件提取邮箱凭证
-        :param config_file_path: 配置文件路径，默认为主程序下config.ini
-        """
+        """get mail config values"""
         if config_file_path and os.path.exists(config_file_path):
             try:
                 con = ConfigParser()
@@ -28,36 +26,33 @@ class sendemail():
                 self.receive_maile = items.get('receive_maile')
 
             except Exception as e:
-                exit('配置文件读取错误：{}'.format(e))
+                exit('read config error: {}'.format(e))
         else:
-            exit('配置文件不存在')
+            exit('config file not found')
 
     def send(self, subject, text, attachment_path=None):
         """
-        发送邮件
-        :param subject: 邮件标题（主题）
-        :param text: 邮件正文
-        :param attachment_path: 附件，默认为空
+        email send fun
+        :param subject: Theme
+        :param text: body
+        :param attachment_path: attachments,default null
         """
         global msg_root
         try:
             msg_root = MIMEMultipart('mixed')
-            # 发送方、接收方
+            # Sender, receiver
             msg_root['From'] = '{}<{}>'.format(self.sender_maile, self.sender_maile)
             msg_root['To'] = self.receive_maile
 
-            # 主题、文本
+            # Theme, text
             msg_root['subject'] = Header(subject, 'utf-8')
             text_sub = MIMEText(text, 'plain', 'utf-8')
             msg_root.attach(text_sub)
         except Exception as e:
-            exit('邮件内容写入失败:{}'.format(e))
+            exit('Description Failed to write the email content: {}'.format(e))
 
         try:
-            """
-            邮件发送
-            根据配置文件中发送者邮箱后缀匹配SMTP服务器及端口
-            """
+            """Matches the SMTP server and port"""
             smtpServerDict = {
                 'qq': {'smtpHost': 'smtp.qq.com', 'port': 25},
                 '163': {'smtpHost': 'smtp.163.com', 'port': 25},
@@ -70,19 +65,18 @@ class sendemail():
             identification = self.sender_maile.split('@')[-1].split('.')[0]
             smtpHost = smtpServerDict[identification]['smtpHost']
             smtpPort = smtpServerDict[identification]['port']
-            # print(smtpHost,'type:',type(smtpHost),smtpPort,'type:',type(smtpPort))
 
             smtp_obj = smtplib.SMTP()
             smtp_obj.connect(smtpHost, smtpPort)
             smtp_obj.login(self.sender_maile, self.sender_pass)
             smtp_obj.sendmail(self.sender_maile, self.receive_maile, msg_root.as_string())
             smtp_obj.quit()
-            print('邮件发送成功')
+            print('email sent successfully')
 
         except Exception as e:
-            exit('邮件发送错误:{}'.format(e))
+            exit('email sent error:{}'.format(e))
 
-# 邮件主题
+# test
 # semail = emailclass()
 # subject = 'tile'
 # text = 'body'
