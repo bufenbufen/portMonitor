@@ -4,10 +4,18 @@ portMonitor（端口监测），基于masscan实现，程序会每日对比上�
 
 
 
-#### 1、安装模块
+#### 1、环境配置
 
 ```
+python模块安装
 python3 -m pip install -r requirements.txt
+
+文件权限
+chmod 755 portMonitor -R
+
+nmap安装
+yum -y install nmap
+apt-get -y install nmap
 ```
 
 
