@@ -1,11 +1,14 @@
-#!/usr/bin/python
-# -*- coding: UTF-8 -*-
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+# @Time    : 2023/5/3 17:22
+# @Author  : name
+# @File    : getconfig.py
 import os.path
 from configparser import ConfigParser
 
 def getconfig():
     """
-    返回配置文件中masscan路径、扫描端口范围
+    Return the masscan path and port range of the configuration file
     widows   F:\a_tools\Information_collection\masscan\masscan.exe
     linux    /usr/bin/masscan
     portRange  1-65535
@@ -13,6 +16,4 @@ def getconfig():
     ConfigPath = os.path.join(os.path.abspath('.'), 'config.ini')
     con = ConfigParser()
     con.read(ConfigPath, encoding='utf-8')
-    masscan = dict(con.items('masscan'))
-    portrange = dict(con.items('portrange'))
-    return masscan.get('path'), portrange.get('range')
+    return dict(con.items('portrange')).get('range')

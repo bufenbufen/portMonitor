@@ -1,50 +1,63 @@
-#!/usr/bin/python
-# -*- coding: UTF-8 -*-
-import datetime
+# -*- coding: utf-8 -*-
+# @Time    : 2023/5/3 17:22
+# @Author  : name
+# @File    : portScan.py
 import os
-import json
+import re
+import platform
 from lib.getconfig import getconfig
-from lib.contentDispose import contentWrite
 
 RootPath = os.path.abspath('.')
-LogDirectory = os.path.join(RootPath,'log')
-today = datetime.datetime.now().strftime('%Y_%m_%d')
 
 def portScan():
-    """利用masscan执行端口扫描"""
-    global today
-    # masscan扫描结果
-    scanResultList = []
-    tmpFile = os.path.join(RootPath, 'tmp.json')
-    if os.path.exists(tmpFile): os.remove(tmpFile)
-    masscanPath, portRange = getconfig()
-    targetipFile = os.path.join(RootPath, 'ip.txt')
+    """
+    masscan scan port
+    return scanReusltDict = {'127.0.0.1':[80,81,8080]}
+    """
+    try:
+        scanReusltDict = {}
+        tmpFile = os.path.join(RootPath, 'tmp.json')
 
+        # delete tmp file
+        if os.path.exists(tmpFile): os.remove(tmpFile)
 
-    command = '{0} -iL {1} -p {2} -oJ {3} --rate 1000'.format(masscanPath, targetipFile, portRange, tmpFile)
-    print('【command】 "{}"'.format(command))
-    os.system(command)
+        plat = platform.system().lower()
 
-    if os.path.exists(tmpFile):
-        # 提取json文件中的端口
-        with open(tmpFile, 'r') as f:
-            for line in f:
-                try:
-                    if line.startswith('{ '):
-                        line = line.replace('},', '}')
-                        temp = json.loads(line)
-                        temp1 = temp["ports"][0]
-                        scanResultList.append(temp["ip"] + ':' + str(temp1["port"]))
-                except Exception as e:
-                    continue
-            print('开放端口:\n'+'\n'.join(scanResultList))
+        if plat == 'windows':masscanPath = os.path.join(RootPath,'bin','masscan.exe')
+        elif plat == 'linux':masscanPath = os.path.join(RootPath,'bin','masscan')
+        else:exit()
+
+        portRange = getconfig()
+        targetipFile = os.path.join(RootPath, 'ip.txt')
+
+        command = '{0} -iL {1} -p {2} -oJ {3} --rate 1000'.format(masscanPath, targetipFile, portRange, tmpFile)
+        print('command: "{}"'.format(command))
+        os.system(command)
 
         if os.path.exists(tmpFile):
-            os.remove(tmpFile)
-            pass
+            # Extract ports from json
+            with open(tmpFile, 'r',encoding='utf-8') as f:
+                for line in f.readlines():
+                    try:
+                        ip = re.search('((2(5[0-5]|[0-4]\d))|[0-1]?\d{1,2})(\.((2(5[0-5]|[0-4]\d))|[0-1]?\d{1,2})){3}',line)
+                        port = re.search('port: (\d*),',line)
+                        scanReusltDict.setdefault(ip.group(0),[]).append(port.group(1))
+                    except Exception as e:
+                        # print(e)
+                        continue
+
+            if os.path.exists(tmpFile):
+                os.remove(tmpFile)
+                pass
+            else:
+                pass
         else:
             pass
-    else:
-        print("扫描目标未发现端口开放")
-    contentWrite(os.path.join(LogDirectory, 'scanresult{}.log'.format(today)), scanResultList)
-    return scanResultList
+    except KeyboardInterrupt:
+        exit('ctrl-c end')
+    except Exception as e:
+        exit('port scan'+e)
+
+    return scanReusltDict
+
+

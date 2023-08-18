@@ -1,73 +1,78 @@
-#!/usr/bin/python
-# -*- coding: UTF-8 -*-
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+# @Time    : 2023/5/3 17:22
+# @Author  : name
+# @File    : portMonitor.py
 import datetime
 import os
 from dateutil.relativedelta import relativedelta
+from pyfiglet import Figlet
 from lib.sendemail import sendemail
 from lib.isMonday import isMonday
 from lib.portScan import portScan
-from lib.contentDispose import contentCheck
-
+from lib.contentDispose import contentWrite,contentCheck
+from lib.serverScan import serverScan
 
 RootPath = os.path.abspath('.')
 LogDirectory = os.path.join(RootPath,'log')
-# 今日、昨日
-today = datetime.datetime.now().strftime('%Y_%m_%d')
-yesterday = (datetime.datetime.now() + relativedelta(days=-1)).strftime("%Y_%m_%d")
-
+today, yesterday = datetime.datetime.now().strftime('%Y%m%d'), (datetime.datetime.now() + relativedelta(days=-1)).strftime("%Y%m%d")
 
 def main():
-    """主程序"""
-    global today, yesterday
-    text = ''
-    print('【{}】【端口扫描】'.format(today))
-    scanResultList = portScan()
+    artWord = Figlet(font='slant')
+    print('---------------------------------------------------------------')
+    print(artWord.renderText('portMonitor'))
+    print('---------------------------------------------------------------')
 
-    is_monday = isMonday()
+    emailText = ''
+    # port scan, return {'127.0.0.1':[80,81,8080]}
+    openPortDict = portScan()
 
-    if os.path.exists(os.path.join(LogDirectory,'scanresult{}.log'.format(yesterday))):
-        todayFileName = os.path.join(LogDirectory, 'scanresult{}.log'.format(today))
-        yesterdayFileName = os.path.join(LogDirectory,'scanresult{}.log'.format(yesterday))
-        changeDict = contentCheck(todayFileName,yesterdayFileName)
+    # server scan,return {'127.0.0.1':[{'PORT':80,'SERVICE':'http','VERSION':'nginx 1.22.1'},],}
+    portServerDict = serverScan(openPortDict)
+
+    # portServerDict = {'121.5.110.219': [{'PORT': 22, 'SERVICE': 'ssh', 'VERSION': 'OpenSSH 8.2p1 Ubuntu 4ubuntu0.3'}, {'PORT': 80, 'SERVICE': 'http', 'VERSION': ' '}], '175.178.253.93': [{'PORT': 22, 'SERVICE': 'ssh', 'VERSION': 'OpenSSH 7.4'}, {'PORT': 80, 'SERVICE': 'http', 'VERSION': 'nginx '}]}
+
+    # dict to json, write file
+    resultFileName = os.path.join(LogDirectory, '{}_scanResult.json')
+    contentWrite(resultFileName.format(today),portServerDict)
+
+    is_Monday = isMonday()
+
+    if os.path.exists(resultFileName.format(yesterday)):
+        # Changed data dictionary
+        changeDict = contentCheck(resultFileName.format(today),resultFileName.format(yesterday))
 
         if changeDict:
-            """
-            :param addList: 今日新增的端口列表
-            :param reduceList: 今日关闭的端口列表
-            """
-            addList = changeDict['add']
-            reduceList = changeDict['reduce']
+            '''
+            addList: compare the port list added yesterday
+            reduceList: compare the port list that was reduced yesterday
+            '''
+            addList, reduceList = changeDict['add'], changeDict['reduce']
 
+            # only add\only close\add and close
             if len(addList) > 0 and len(reduceList) == 0:
-                text = '【--今日监测新增{}个端口--】\n{}'.format(len(addList),'\n'.join(addList))
-
+                emailText = '[monitor]-added {} ports\n{}'.format(len(addList), '\n'.join(addList))
             elif len(addList) == 0 and len(reduceList) > 0:
-                text = '【--今日监测关闭{}个端口--】\n{}'.format(len(reduceList),'\n'.join(reduceList))
-
-            # 新增 关闭同时存在
+                emailText = '[monitor]-close {} ports\n{}'.format(len(reduceList), '\n'.join(reduceList))
             elif len(addList) > 0 and len(reduceList) > 0:
-                text = '【--今日监测新增{}个端口--】\n{}\n'.format(len(addList),'\n'.join(addList))
-                text = text + '【--今日监测关闭{}个端口--】\n{}'.format(len(reduceList),'\n'.join(reduceList))
-
+                emailText = '[monitor]-added {} ports\n{}\n==================================\n[monitor]-close {} ports\n{}'\
+                    .format(len(addList), '\n'.join(addList), len(reduceList), '\n'.join(reduceList))
             else:
                 pass
+        elif not is_Monday: exit('no change in assets')
 
-        elif not is_monday:
-            exit('【--今日开放端口与昨日一致--】')
+    if is_Monday or not os.path.exists(resultFileName.format(yesterday)):
+        todayContentList = []
+        for ip in portServerDict.keys():todayContentList += ['{} {} {} {}'.format(ip, infoDict.get('PORT'), infoDict.get('SERVICE'), infoDict.get('VERSION')) for infoDict in portServerDict[ip]]
+        emailText = emailText + '[monitor]-total open {}\n{}'.format(len(todayContentList),'\n'.join(todayContentList))
 
-
-    if is_monday or not os.path.exists(os.path.join(LogDirectory,'scanresult{}.log'.format(yesterday))):
-        text = text + '【--发现端口--】\n{}'.format('\n'.join(scanResultList))
-
-    # print(text)
-    if text:
-        print('邮件内容:\n{}'.format(text))
-
+    if emailText:
+        print('email content:\n{}'.format(emailText))
         semail = sendemail()
-        subject = '端口监测{}'.format(today)
-        semail.send(subject, text)
+        subject = 'port monitor{}'.format(today)
+        semail.send(subject, emailText)
 
-    exit('程序结束')
+    exit('finish')
 
 if __name__ == "__main__":
     main()

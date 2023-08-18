@@ -1,27 +1,22 @@
-#!/usr/bin/python
-# -*- coding: UTF-8 -*-
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+# @Time    : 2023/5/3 17:22
+# @Author  : name
+# @File    : isMonday.py
 import calendar
 import datetime
 
-
 def isMonday():
-    """判断周几，预期每周一 下发一次开放的全部端口"""
-
+    """Determine whether it is Monday or Wednesday"""
     currentDate = datetime.date.today()
 
-    year = currentDate.year
-    month = currentDate.month
-    day = currentDate.day
-
-    # print(calendar.weekday(year, month, day))
+    year,month,day = currentDate.year,currentDate.month,currentDate.day
     currentDay = calendar.weekday(year, month, day)
     """
-    currentday = 0 --> 星期一
-    currentday = 2 --> 星期二
-    currentday = 3 --> 星期三
+    currentday = 0 --> Monday
+    currentday = 1 --> Tuesday
+    currentday = 2 --> Wednesday
     ...
     """
-
-    if currentDay == 3:
-        return True
+    if currentDay == 0 or currentDay == 2:return True
     return False
